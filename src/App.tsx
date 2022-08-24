@@ -1,27 +1,40 @@
-import type { Component } from 'solid-js';
+import { createSignal } from "solid-js";
+import { AddBook } from "./AddBook";
+import { BookList } from "./BookList";
 
-import logo from './logo.svg';
-import styles from './App.module.css';
+export type Book = {
+  title: string;
+  author: string;
+};
 
-const App: Component = () => {
+const initialBooks: Book[] = [
+  { title: "Code Complete", author: "Steve McConnell" },
+  { title: "The Hobbit", author: "J.R.R. Tolkien" },
+  { title: "Living a Feminist Life", author: "Sarah Ahmed" },
+];
+
+interface BookshelfProps {
+  name: string;
+}
+
+// We cannot destructure props in SolidJS, otherwise we lose reactivity.
+// Under the hood, a proxy is used to track when props are accessed.
+// If we destructure the props, we lose out on the proxy's features.
+function Bookshelf(props: BookshelfProps) {
+  const [books, setBooks] = createSignal(initialBooks);
+
   return (
-    <div class={styles.App}>
-      <header class={styles.header}>
-        <img src={logo} class={styles.logo} alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          class={styles.link}
-          href="https://github.com/solidjs/solid"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn Solid
-        </a>
-      </header>
+    <div>
+      <h1>{props.name}'s Bookshelf</h1>
+      {/* It's best practice to call a signal when passing as a prop */}
+      <BookList books={books()} />
+      <AddBook setBooks={setBooks} />
     </div>
   );
-};
+}
+
+function App() {
+  return <Bookshelf name="Solid" />;
+}
 
 export default App;
