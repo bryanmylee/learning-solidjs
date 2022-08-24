@@ -28,6 +28,11 @@ export function AddBook(props: AddBookProps) {
     setQuery(input());
   };
 
+  const handleAddBook = (book: Book, ev: MouseEvent) => {
+    console.log("clicked", ev.currentTarget);
+    props.setBooks((prevBooks) => [...prevBooks, book]);
+  };
+
   return (
     <>
       <form onSubmit={handleSearch}>
@@ -52,9 +57,12 @@ export function AddBook(props: AddBookProps) {
                 <button
                   type="button"
                   aria-label={`Add ${book.title} by ${book.author} to the bookshelf`}
-                  onClick={(ev) => {
-                    props.setBooks((prevBooks) => [...prevBooks, book]);
-                  }}
+                  // Pass an array to avoid creating additional closures for
+                  // performance while still supporting delegated event
+                  // handling.
+                  // The handler will be called with `book` as its first
+                  // argument and the native event as its second.
+                  onClick={[handleAddBook, book]}
                 >
                   Add
                 </button>
