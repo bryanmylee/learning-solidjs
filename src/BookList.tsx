@@ -16,7 +16,15 @@ export function BookList(props: BookListProps) {
   return (
     <>
       <h2>My books ({totalBooks()})</h2>
-      <h2>My more efficient books ({savedTotalBooks()})</h2>
+      <h2
+        style={{
+          // `style` is a wrapper for `style.setProperty`.
+          // Use kebab-case.
+          "font-size": "1rem",
+        }}
+      >
+        My more efficient books ({savedTotalBooks()})
+      </h2>
       <ul>
         <For each={props.books}>
           {(book) => (
