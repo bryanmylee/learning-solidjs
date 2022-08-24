@@ -33,6 +33,16 @@ export function AddBook(props: AddBookProps) {
     props.setBooks((prevBooks) => [...prevBooks, book]);
   };
 
+  // Callback refs can be used to detect when nodes are created.
+  // However, this does not necessarily mean that the node is attached to the DOM.
+  const listRef = (node: HTMLElement) => {
+    console.log("got node", node);
+    console.log("is node in DOM?", node.isConnected);
+    setTimeout(() => {
+      console.log("after 100ms, is node in DOM?", node.isConnected);
+    }, 100);
+  };
+
   return (
     <>
       <form onSubmit={handleSearch}>
@@ -49,7 +59,7 @@ export function AddBook(props: AddBookProps) {
         <button type="submit">Search</button>
       </form>
       <Show when={!data.loading} fallback={<>Searching...</>}>
-        <ul>
+        <ul ref={listRef}>
           <For each={data()}>
             {(book) => (
               <li>
