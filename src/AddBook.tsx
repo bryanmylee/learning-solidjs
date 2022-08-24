@@ -53,7 +53,7 @@ export function AddBook(props: AddBookProps) {
                   type="button"
                   aria-label={`Add ${book.title} by ${book.author} to the bookshelf`}
                   onClick={(ev) => {
-                    props.setBooks((books) => [...books, book]);
+                    props.setBooks((prevBooks) => [...prevBooks, book]);
                   }}
                 >
                   Add
