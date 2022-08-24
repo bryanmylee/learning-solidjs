@@ -1,43 +1,68 @@
-import { createSignal, type JSX, type Setter } from "solid-js";
+import {
+  createResource,
+  createSignal,
+  For,
+  Show,
+  type JSX,
+  type Setter,
+} from "solid-js";
 import { Book } from "./App";
+import { searchBooks } from "./searchBooks";
 
 interface AddBookProps {
   setBooks: Setter<Book[]>;
 }
 
-const emptyBook: Book = { title: "", author: "" };
-
 export function AddBook(props: AddBookProps) {
-  const [newBook, setNewBook] = createSignal(emptyBook);
+  const [input, setInput] = createSignal("");
+  const [query, setQuery] = createSignal("");
+  // Whenever the signal `query` updates to a value other than `null`,
+  // `undefined`, or `false`, the second argument will run with the value of
+  // the signal.
+  // `data` is type Resource<T> which is a signal but it also has properties
+  // `loading` and `error`.
+  const [data] = createResource(query, searchBooks);
 
-  const addBook: JSX.EventHandler<HTMLFormElement, Event> = (ev) => {
+  const handleSearch: JSX.EventHandler<HTMLFormElement, Event> = (ev) => {
     ev.preventDefault();
-    props.setBooks((prevBooks) => [...prevBooks, newBook()]);
-    setNewBook(emptyBook);
+    setQuery(input());
   };
+
   return (
-    <form onSubmit={addBook}>
-      <div>
-        <label for="title">Book name</label>
-        <input
-          id="title"
-          value={newBook().title}
-          onInput={(ev) => {
-            setNewBook({ ...newBook(), title: ev.currentTarget.value });
-          }}
-        />
-      </div>
-      <div>
-        <label for="author">Author</label>
-        <input
-          id="author"
-          value={newBook().author}
-          onInput={(ev) => {
-            setNewBook({ ...newBook(), author: ev.currentTarget.value });
-          }}
-        />
-      </div>
-      <button type="submit">Add book</button>
-    </form>
+    <>
+      <form onSubmit={handleSearch}>
+        <div>
+          <label for="title">Search books</label>
+          <input
+            id="title"
+            value={input()}
+            onInput={(ev) => {
+              setInput(ev.currentTarget.value);
+            }}
+          />
+        </div>
+        <button type="submit">Search</button>
+      </form>
+      <Show when={!data.loading} fallback={<>Searching...</>}>
+        <ul>
+          <For each={data()}>
+            {(book) => (
+              <li>
+                {book.title} by {book.author}
+                <button
+                  type="button"
+                  aria-label={`Add ${book.title} by ${book.author} to the bookshelf`}
+                  onClick={(ev) => {
+                    props.setBooks((books) => [...books, book]);
+                  }}
+                >
+                  Add
+                </button>
+              </li>
+            )}
+          </For>
+        </ul>
+      </Show>
+    </>
   );
 }
