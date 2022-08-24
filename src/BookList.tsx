@@ -1,4 +1,4 @@
-import { createMemo, For } from "solid-js";
+import { createMemo, createSignal, For } from "solid-js";
 import { Book } from "./App";
 
 interface BookListProps {
@@ -13,6 +13,8 @@ export function BookList(props: BookListProps) {
   // `books.length` will only be called when it changes.
   const savedTotalBooks = createMemo(() => props.books.length);
 
+  const [dynamicClass] = createSignal("random");
+
   return (
     <>
       <h2>My books ({totalBooks()})</h2>
@@ -25,7 +27,17 @@ export function BookList(props: BookListProps) {
       >
         My more efficient books ({savedTotalBooks()})
       </h2>
-      <ul>
+      <ul
+        class="list"
+        // `classList` is a convenient way to toggle classes
+        // Keys are class names and values determine whether they are enabled.
+        // Keys can be dynamic.
+        classList={{
+          "enabled-class": true,
+          "disabled-class": false,
+          [dynamicClass()]: true,
+        }}
+      >
         <For each={props.books}>
           {(book) => (
             <li>
